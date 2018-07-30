@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 public class IterableLinkHandlerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        SimpleApp.main(new String[]{"derbyClient"});
+
         String name = request.getParameter("name");
         if (name == null) {
             name = "World";
