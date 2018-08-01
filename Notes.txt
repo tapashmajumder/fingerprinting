@@ -1,0 +1,7 @@
+export DERBY_HOME=/usr/local/derby
+
+For Embedded
+cd db
+. /usr/local/derby/bin/setEmbeddedCP
+java org.apache.derby.tools.ij
+
