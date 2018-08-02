@@ -80,10 +80,14 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 <script>
+    var globalFp;
+    var globalResult;
     document.querySelector("#btn").addEventListener("click", function () {
         var d1 = new Date();
         var fp = new Fingerprint2();
         fp.get(function(result, components) {
+            globalResult = result;
+            globalFp = components;
             var d2 = new Date();
             var timeString = "Time took to calculate the fingerprint: " + (d2 - d1) + "ms";
             var details = "<strong>Detailed information: </strong><br />";

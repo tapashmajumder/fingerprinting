@@ -1,24 +1,22 @@
 package ace.fingerprinting.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BrowserResponse {
-    private String id;
-    private BrowserFp browserFp;
+    public String id;
 
-    public BrowserResponse() {}
+    public String userAgent;
 
-    public String getId() {
-        return id;
-    }
+    public String navigatorPlatform;
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String screenWidth;
 
-    public BrowserFp getBrowserFp() {
-        return browserFp;
-    }
+    public String screenHeight;
 
-    public void setBrowserFp(BrowserFp browserFp) {
-        this.browserFp = browserFp;
-    }
+    public String scale;
+
+    public String navigatorLanguage;
+
+    public String timezoneOffset;
 }

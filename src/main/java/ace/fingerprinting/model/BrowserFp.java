@@ -1,69 +1,20 @@
 package ace.fingerprinting.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BrowserFp {
-    private String userAgent;
-    private int screenWidth;
-    private int screenHeight;
-    private String osVersion;
-    private float scale;
-    private String userLocale;
-    private int timeZoneOffset;
+    public String userAgent;
 
-    public BrowserFp() {}
+    public String navigatorPlatform;
 
-    public String getUserAgent() {
-        return userAgent;
-    }
+    public String screenWidth;
 
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
-    }
+    public String screenHeight;
 
-    public int getScreenWidth() {
-        return screenWidth;
-    }
+    public String scale;
 
-    public void setScreenWidth(int screenWidth) {
-        this.screenWidth = screenWidth;
-    }
+    public String navigatorLanguage;
 
-    public int getScreenHeight() {
-        return screenHeight;
-    }
-
-    public void setScreenHeight(int screenHeight) {
-        this.screenHeight = screenHeight;
-    }
-
-    public String getOsVersion() {
-        return osVersion;
-    }
-
-    public void setOsVersion(String osVersion) {
-        this.osVersion = osVersion;
-    }
-
-    public float getScale() {
-        return scale;
-    }
-
-    public void setScale(float scale) {
-        this.scale = scale;
-    }
-
-    public String getUserLocale() {
-        return userLocale;
-    }
-
-    public void setUserLocale(String userLocale) {
-        this.userLocale = userLocale;
-    }
-
-    public int getTimeZoneOffset() {
-        return timeZoneOffset;
-    }
-
-    public void setTimeZoneOffset(int timeZoneOffset) {
-        this.timeZoneOffset = timeZoneOffset;
-    }
+    public String timezoneOffset;
 }

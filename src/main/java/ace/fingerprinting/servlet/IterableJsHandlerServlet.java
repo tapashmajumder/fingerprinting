@@ -32,14 +32,14 @@ public class IterableJsHandlerServlet extends HttpServlet {
         try {
             BrowserResponse browserResponse = parse(request.getInputStream());
             try (FpInfoConnectionWrapper connectionWrapper = new FpInfoConnectionWrapper()) {
-                Optional<FpInfo> fpInfoOptional = connectionWrapper.select(browserResponse.getId());
+                Optional<FpInfo> fpInfoOptional = connectionWrapper.select(browserResponse.id);
                 if (!fpInfoOptional.isPresent()) {
                     // handler error and bail
                     return;
                 }
 
                 FpInfo fpInfo = fpInfoOptional.get();
-                fpInfo.setBrowserFp(serialize(browserResponse.getBrowserFp()));
+                fpInfo.setBrowserFp(serialize(browserFpFromBrowserResponse(browserResponse)));
                 connectionWrapper.update(fpInfo);
                 connectionWrapper.commit();
             }
@@ -51,6 +51,18 @@ public class IterableJsHandlerServlet extends HttpServlet {
     private static BrowserResponse parse(InputStream inputStream) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(inputStream, BrowserResponse.class);
+    }
+
+    private static BrowserFp browserFpFromBrowserResponse(BrowserResponse browserResponse) {
+        BrowserFp browserFp = new BrowserFp();
+        browserFp.userAgent = browserResponse.userAgent;
+        browserFp.navigatorPlatform = browserResponse.navigatorPlatform;
+        browserFp.screenWidth = browserResponse.screenWidth;
+        browserFp.screenHeight = browserResponse.screenHeight;
+        browserFp.scale = browserResponse.scale;
+        browserFp.navigatorLanguage = browserResponse.navigatorLanguage;
+        browserFp.timezoneOffset = browserResponse.timezoneOffset;
+        return browserFp;
     }
 
     private static String serialize(BrowserFp browserFp) throws JsonProcessingException {

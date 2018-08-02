@@ -12,30 +12,33 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
       function trackAndRedirect() {
-          axios.post('/js/', {
-              "id": document.getElementById('id-id').value,
-              "browserFp" : createBrowserFp()
-          }).then(function (response) {
+          axios.post('/js/', createBrowserResponse())
+          .then(function (response) {
               console.log('then:');
               console.log(response);
               window.location = document.getElementById('app-store-url-id').value;
-          }).catch(function(error){
+          })
+          .catch(function(error){
               console.log('error');
               console.log(error);
           });
 
       }
 
-      function createBrowserFp() {
-          var browserFp = {};
-          browserFp.userAgent = "zee user agent";
-          browserFp.screenWidth = 300;
-          browserFp.screenHeight = 300;
-          browserFp.osVersion = "11.4.2";
-          browserFp.scale = 2.5;
-          browserFp.userLocale = "en-US";
-          browserFp.timeZoneOffset = 420;
-          return browserFp;
+      function createBrowserResponse() {
+          var browserResponse = {};
+          browserResponse.id = document.getElementById('id-id').value;
+          browserResponse.userAgent = navigator.userAgent;
+          browserResponse.navigatorPlatform = navigator.platform;
+          browserResponse.screenWidth = '' + window.screen.width;
+          browserResponse.screenHeight = '' + window.screen.height;
+          var scale = window.devicePixelRatio;
+          if (typeof scale !== 'undefined') {
+              browserResponse.scale = '' + scale;
+          }
+          browserResponse.navigatorLanguage = navigator.language;
+          browserResponse.timezoneOffset = '' + new Date().getTimezoneOffset();
+          return browserResponse;
       }
     </script>
   </head>
