@@ -2,6 +2,7 @@
   <configuration default="false" name="tomcat-server" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.10" ALTERNATIVE_JRE_ENABLED="false">
     <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8080" />
     <option name="BROWSER_ID" value="e5120d43-2c3f-47ef-9f26-65e539e05186" />
+    <option name="SHOW_DIALOG_ON_UPDATE" value="false" />
     <deployment>
       <artifact name="Gradle : ace : fingerprinting-1.0-SNAPSHOT.war (exploded)">
         <settings>

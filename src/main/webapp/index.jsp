@@ -8,9 +8,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
   <head>
-    <title>$user$</title>
+    <title>Zee Title</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   </head>
   <body>
-  $END$
+  <input id='id-id' type="hidden" value='<%=request.getAttribute("id")%>'/>
+
   </body>
 </html>
