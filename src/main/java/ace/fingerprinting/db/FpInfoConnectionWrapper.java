@@ -1,5 +1,7 @@
 package ace.fingerprinting.db;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -14,8 +16,12 @@ import java.util.stream.Collectors;
 
 import ace.fingerprinting.model.FpInfo;
 
+/**
+ * This is a wrapper around JdbcConnection
+ */
+public class FpInfoConnectionWrapper implements Closeable {
+    private static final String jdbcUrl = "jdbc:derby://localhost:1527/fp";
 
-public class DB {
     private Connection connection;
 
     private static final String tableName = "fp";
@@ -28,8 +34,8 @@ public class DB {
         }
     }
 
-    public void open() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:derby://localhost:1527/fp");
+    public FpInfoConnectionWrapper() throws SQLException {
+        connection = DriverManager.getConnection(jdbcUrl);
 
         // We want to control transactions manually. Autocommit is on by
         // default in JDBC.
@@ -73,18 +79,11 @@ public class DB {
         return fpInfos;
     }
 
-    private FpInfo getFpInfo(ResultSet resultSet) throws SQLException {
-        FpInfo fpInfo = new FpInfo();
-        fpInfo.setId(resultSet.getString(1));
-        long time = resultSet.getLong(2);
-        fpInfo.setTime(new Date(time));
-        fpInfo.setIpAddress(resultSet.getString(3));
-        fpInfo.setCampaignId(resultSet.getString(4));
-        fpInfo.setTemplateId(resultSet.getString(5));
-        fpInfo.setMessageId(resultSet.getString(6));
-        fpInfo.setDestinationUrl(resultSet.getString(7));
-        fpInfo.setBrowserFp(resultSet.getString(8));
-        return fpInfo;
+    public void deleteAll() throws SQLException {
+        String sql = MessageFormat.format("DELETE FROM {0}",
+                tableName);
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(sql);
     }
 
     public void create(FpInfo fpInfo) throws SQLException {
@@ -114,10 +113,29 @@ public class DB {
         statement.executeUpdate(sql);
     }
 
-    public void close() throws SQLException {
+    @Override
+    public void close() throws IOException {
         if (connection != null) {
-            connection.close();
+            try {
+                connection.close();
+            } catch (SQLException ex) {
+                throw new IOException(ex);
+            }
         }
+    }
+
+    private FpInfo getFpInfo(ResultSet resultSet) throws SQLException {
+        FpInfo fpInfo = new FpInfo();
+        fpInfo.setId(resultSet.getString(1));
+        long time = resultSet.getLong(2);
+        fpInfo.setTime(new Date(time));
+        fpInfo.setIpAddress(resultSet.getString(3));
+        fpInfo.setCampaignId(resultSet.getString(4));
+        fpInfo.setTemplateId(resultSet.getString(5));
+        fpInfo.setMessageId(resultSet.getString(6));
+        fpInfo.setDestinationUrl(resultSet.getString(7));
+        fpInfo.setBrowserFp(resultSet.getString(8));
+        return fpInfo;
     }
 
     static class DbValue {
@@ -131,7 +149,7 @@ public class DB {
     }
 
     static String getUpdateSetString(List<DbValue> dbValues) {
-        return dbValues.stream().map(DB::mapToUpdateString).flatMap(Optional::stream).collect(Collectors.joining(","));
+        return dbValues.stream().map(FpInfoConnectionWrapper::mapToUpdateString).flatMap(Optional::stream).collect(Collectors.joining(","));
     }
 
     static Optional<String> mapToUpdateString(DbValue dbValue) {
@@ -174,11 +192,11 @@ public class DB {
     }
 
     static String getColumnNames(List<DbValue> dbValues) {
-        return dbValues.stream().map(DB::mapToColumnName).flatMap(Optional::stream).collect(Collectors.joining(","));
+        return dbValues.stream().map(FpInfoConnectionWrapper::mapToColumnName).flatMap(Optional::stream).collect(Collectors.joining(","));
     }
 
     static String getQuotedColumnValues(List<DbValue> dbValues) {
-        return dbValues.stream().map(DB::mapToColumnValue).flatMap(Optional::stream).map(DB::valueInQuotes).collect(Collectors.joining(","));
+        return dbValues.stream().map(FpInfoConnectionWrapper::mapToColumnValue).flatMap(Optional::stream).map(FpInfoConnectionWrapper::valueInQuotes).collect(Collectors.joining(","));
     }
 
     static String inQuotes(String val) {
