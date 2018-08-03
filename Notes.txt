@@ -1,3 +1,8 @@
+
+
+To create schema
+
+-------------------------------------------->
 export DERBY_HOME=/usr/local/derby
 
 For Embedded
@@ -5,3 +10,11 @@ cd db
 . /usr/local/derby/bin/setEmbeddedCP
 java org.apache.derby.tools.ij
 
+> connect 'jdbc:derby:fp;create=true';
+
+> run '../sql/createSchema.sql';
+
+
+To stop and Start Db
+--------------------------------------------->
+/usr/local/derby/bin/stop (or start)
