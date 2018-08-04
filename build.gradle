@@ -1,6 +1,21 @@
-plugins {
-    id 'java'
-    id 'war'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.3.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'war'
+
+bootJar {
+    baseName = 'gs-rest-service'
+    version =  '0.1.0'
 }
 
 group 'ace'
@@ -14,13 +29,16 @@ repositories {
 }
 
 dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
     compile 'com.fasterxml.jackson.core:jackson-core:2.9.6'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.6'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
-    providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+
     testCompile group: 'org.testng', name: 'testng', version: '6.14.3'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.10.0'
     compile group: 'org.apache.derby', name: 'derbyclient', version: '10.14.2.0'
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('com.jayway.jsonpath:json-path')
 }
 
 test {
