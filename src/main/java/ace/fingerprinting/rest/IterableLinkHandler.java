@@ -1,14 +1,18 @@
-package ace.fingerprinting.servlet;
+package ace.fingerprinting.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,17 +22,31 @@ import ace.fingerprinting.model.BrowserFp;
 import ace.fingerprinting.model.BrowserResponse;
 import ace.fingerprinting.model.FpInfo;
 
-@WebServlet(name = "IterableJsHandlerServlet", urlPatterns = {"/js/*"}, loadOnStartup = 1)
-public class IterableJsHandlerServlet extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+@RestController
+public class IterableLinkHandler {
+    private static final String appStoreUrl = "https://itunes.apple.com/us/app/id942371713?mt=8";
+    private static final String destinationUrl = "https://majumder.me/coffee/mocha";
 
-        super.doGet(request, response);
+    @GetMapping("/a/*")
+    public void handleDeepLink(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        final String id = UUID.randomUUID().toString().replace("-", "");
+
+        final String ipAddress = request.getRemoteAddr();
+        try {
+            createFpInfo(id, ipAddress);
+        } catch (SQLException e) {
+            //TODO: handle properly
+            e.printStackTrace();
+        }
+
+        request.setAttribute("id", id);
+        request.setAttribute("app-store-url", appStoreUrl);
+
+        request.getRequestDispatcher("/index.jsp").forward(request, response);
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
+    @PostMapping("/js/*")
+    public void handleJs(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         try {
             BrowserResponse browserResponse = parse(request.getInputStream());
             try (FpInfoConnectionWrapper connectionWrapper = new FpInfoConnectionWrapper()) {
@@ -69,4 +87,17 @@ public class IterableJsHandlerServlet extends HttpServlet {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(browserFp);
     }
+
+    private static void createFpInfo(final String id, String ipAddress) throws SQLException, IOException {
+        FpInfo fpInfo = new FpInfo();
+        fpInfo.setId(id);
+        fpInfo.setIpAddress(ipAddress);
+        fpInfo.setTime(new Date());
+        fpInfo.setDestinationUrl(destinationUrl);
+        try (FpInfoConnectionWrapper connectionWrapper = new FpInfoConnectionWrapper()) {
+            connectionWrapper.create(fpInfo);
+            connectionWrapper.commit();
+        }
+    }
+
 }
