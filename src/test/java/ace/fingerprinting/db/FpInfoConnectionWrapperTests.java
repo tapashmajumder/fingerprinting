@@ -91,6 +91,41 @@ public class FpInfoConnectionWrapperTests {
     }
 
     @Test
+    void findByIp() throws Exception {
+        try (FpInfoConnectionWrapper connectionWrapper = new FpInfoConnectionWrapper()) {
+            final Date time = new Date();
+            FpInfo fpInfo = new FpInfo();
+            fpInfo.setIpAddress("1.2.3.4");
+            fpInfo.setTime(time);
+
+            fpInfo.setId(UUID.randomUUID().toString().replace("-", ""));
+            connectionWrapper.create(fpInfo);
+            connectionWrapper.commit();
+
+            fpInfo.setId(UUID.randomUUID().toString().replace("-", ""));
+            connectionWrapper.create(fpInfo);
+            connectionWrapper.commit();
+
+            fpInfo.setId(UUID.randomUUID().toString().replace("-", ""));
+            connectionWrapper.create(fpInfo);
+            connectionWrapper.commit();
+
+            fpInfo.setIpAddress("3.4.5.6");
+            fpInfo.setId(UUID.randomUUID().toString().replace("-", ""));
+            connectionWrapper.create(fpInfo);
+            connectionWrapper.commit();
+
+            List<FpInfo> fpInfos = connectionWrapper.findAllByIp("1.2.3.4");
+            assertThat(fpInfos.size()).isEqualTo(3);
+
+            fpInfos = connectionWrapper.findAllByIp("3.4.5.6");
+            assertThat(fpInfos.size()).isEqualTo(1);
+
+            connectionWrapper.commit();
+        }
+    }
+
+    @Test
     void selectAll() throws Exception {
         try (FpInfoConnectionWrapper connectionWrapper = new FpInfoConnectionWrapper()) {
             for (int i = 0; i < 10; i++) {

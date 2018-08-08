@@ -26,6 +26,9 @@ import ace.fingerprinting.model.FpInfo;
 public class IterableLinkHandler {
     private static final String appStoreUrl = "https://itunes.apple.com/us/app/id942371713?mt=8";
     private static final String destinationUrl = "https://majumder.me/coffee/mocha";
+    private static final String campaignId = "cid";
+    private static final String templateId = "tid";
+    private static final String messageId = "mid";
 
     @GetMapping("/a/*")
     public void handleDeepLink(HttpServletRequest request, HttpServletResponse response) throws Throwable {
@@ -93,6 +96,9 @@ public class IterableLinkHandler {
         fpInfo.setId(id);
         fpInfo.setIpAddress(ipAddress);
         fpInfo.setTime(new Date());
+        fpInfo.setCampaignId(campaignId);
+        fpInfo.setTemplateId(templateId);
+        fpInfo.setMessageId(messageId);
         fpInfo.setDestinationUrl(destinationUrl);
         try (FpInfoConnectionWrapper connectionWrapper = new FpInfoConnectionWrapper()) {
             connectionWrapper.create(fpInfo);

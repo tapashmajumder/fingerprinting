@@ -51,7 +51,7 @@ public class FpInfoConnectionWrapper implements Closeable {
                 "SELECT id, time, ip_address, campaign_id, template_id, message_id, destination_url, browser_fp FROM {0} WHERE id = ''{1}''",
                 tableName,
                 id);
-        System.out.println("Executing query: " + sql);
+        log("Executing query: " + sql);
         Statement statement = connection.createStatement();
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             if (!resultSet.next()) {
@@ -60,6 +60,24 @@ public class FpInfoConnectionWrapper implements Closeable {
                 return Optional.of(getFpInfo(resultSet));
             }
         }
+    }
+
+    public List<FpInfo> findAllByIp(String ipAddress) throws SQLException {
+        List<FpInfo> result = new ArrayList<>();
+
+        String sql = MessageFormat.format(
+                "SELECT id, time, ip_address, campaign_id, template_id, message_id, destination_url, browser_fp FROM {0} WHERE ip_address = ''{1}''",
+                tableName,
+                ipAddress);
+        log("Executing query: " + sql);//!!!
+        Statement statement = connection.createStatement();
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                result.add(getFpInfo(resultSet));
+            }
+        }
+
+        return result;
     }
 
     public List<FpInfo> selectAll() throws SQLException {
@@ -91,7 +109,7 @@ public class FpInfoConnectionWrapper implements Closeable {
                 tableName,
                 getColumnNames(getDbValues(fpInfo)),
                 getQuotedColumnValues(getDbValues(fpInfo)));
-        System.out.println("Executing query: " + sql);
+        log("Executing query: " + sql);
         Statement statement = connection.createStatement();
         statement.executeUpdate(sql);
     }
@@ -136,6 +154,10 @@ public class FpInfoConnectionWrapper implements Closeable {
         fpInfo.setDestinationUrl(resultSet.getString(7));
         fpInfo.setBrowserFp(resultSet.getString(8));
         return fpInfo;
+    }
+
+    private void log(String val) {
+        System.out.println(val);
     }
 
     static class DbValue {
